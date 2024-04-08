@@ -100,41 +100,25 @@ install(){
     # Start mining function
     start_mining() {
         echo \"Starting mining...\"
-        for file in /root/ore/ore*.sh; do
-            if [ -f "$file" ]; then
-                pm2 start -f "$file"
-            fi
-        done
+        pm2 start -f /root/ore/ore*.sh
     }
     
     # Stop the mining function
     stop_mining() {
         echo \"Stopping mining...\"
-        for file in /root/ore/ore*.sh; do
-            if [ -f "$file" ]; then
-                pm2 stop -f "$file"
-            fi
-        done
+        pm2 stop -f /root/ore/ore*.sh
     }
     
     # Start the claim function
     start_claim() {
         echo \"Starting Claim...\"
-        for file in /root/ore/claim*.sh; do
-            if [ -f "$file" ]; then
-                pm2 start -f "$file"
-            fi
-        done
+        pm2 start -f /root/ore/claim*.sh
     }
     
     # Stop the claim function
     stop_claim() {
         echo \"Stopping Claim...\"
-        for file in /root/ore/claim*.sh; do
-            if [ -f "$file" ]; then
-                pm2 stop -f "$file"
-            fi
-        done
+        pm2 stop -f /root/ore/claim*.sh
     }
     
     # query_amount function
