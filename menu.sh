@@ -2,86 +2,6 @@
 
 default_directory="/root/ore"
 solana_config_path="/root/.config/solana/"
-RED='\033[0;31m'
-NC='\033[0m'
-install(){
-    echo -e "${RED}
-    #########################################################
-    #                                                       #
-    #               Starting install packages               #
-    #                                                       #
-    #########################################################
-    ${NC}"
-    
-    sudo apt update
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y npm
-    npm install pm2 -g
-    cargo install ore-cli
-
-    echo -e "${RED}
-    #########################################################
-    #                                                       #
-    #                          Done!                        #
-    #                                                       #
-    #########################################################
-    ${NC}"
-
-    read -p "Please enter the RPC address: " common_rpc
-
-    ore_count=$(ls -l /root/ore*.sh | wc -l)
-    mkdir ore
-    chmod 755 ore
-    cp /root/ore*.sh /root/ore/
-    chmod 755 /root/ore/ore*.sh
-
-    for ((i=1; i<=$ore_count; i++)); do
-        claim_file="/root/ore/claim$i.sh"
-        echo "#!/bin/bash" > "$claim_file"
-        echo "ore --rpc $common_rpc --keypair ~/.config/solana/id$i.json --priority-fee 20000000 claim" >> "$claim_file"
-        chmod 755 "$claim_file"
-    done
-
-    cx_script="#!/bin/bash
-    keypairs=(~/.config/solana/*.json)
-
-    for config in \${keypairs[@]}
-    do
-        ore --rpc $common_rpc --keypair \"\$config\" rewards
-    done"
-
-    echo "$cx_script" > /root/ore/cx.sh
-
-    chmod 755 /root/ore/cx.sh
-
-    echo "cx.sh created with success at /root/ore/cx.sh."
-
-    echo -e "${RED}
-    #########################################################
-    #                                                       #
-    #                 Installation completed.               #
-    #                                                       #
-    #########################################################
-    ${NC}"
-}
-
-# Modify the RPC function
-modify_rpc() {
-    read -p "Please enter a new RPC address: " new_rpc
-    echo "Changing the RPC address of all scripts under $default_directory to $new_rpc ..."
-
-    # Iterate through all .sh files in the directory
-    for file in "$default_directory"/*.sh; do
-        # Check if the file exists and is readable
-        if [ -f "$file" ] && [ -w "$file" ]; then
-            # Change the RPC address
-            sed -i "s|--rpc.*--keypair|--rpc $new_rpc --keypair|" "$file"
-            echo "Successfully modified $file's RPC address to $new_rpc"
-        else
-            echo "Unable to modify $file, file does not exist or is inaccessible."
-        fi
-    done
-}
 
 # Modify the Gas fee function
 modify_gas() {
@@ -168,7 +88,6 @@ watch(){
 # main_menu function
 main_menu() {
     echo "Please select an option: "
-    echo "i. INSTALL"
     echo "1. Modify RPC"
     echo "2. Modify Gas Fee"
     echo "3. Start Mining"
@@ -183,7 +102,6 @@ main_menu() {
     read -p "Please enter your choice: " choice
 
     case $choice in
-        i) install ;;
         1) modify_rpc ;;
         2) modify_gas ;;
         3) start_mining ;;
