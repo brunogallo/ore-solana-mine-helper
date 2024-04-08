@@ -7,7 +7,7 @@ screen -S ore<br><br>
 
 ▫️ After that, run our code:<br>
 ```
-wget https://raw.githubusercontent.com/brunogallo/ore-solana-mine-helper/main/install.sh chmod +x install.sh ./install.sh
+wget https://raw.githubusercontent.com/brunogallo/ore-solana-mine-helper/main/install.sh & chmod +x install.sh & ./install.sh
 ```
 <br>
 ▫️ Choose install first.<br>
