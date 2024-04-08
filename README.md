@@ -9,7 +9,7 @@ screen -S ore<br><br>
 ```
 wget https://raw.githubusercontent.com/brunogallo/ore-solana-mine-helper/b9183c235f1301ea890072b7b6dd0e3918723e80/menu.sh && chmod +x menu.sh && ./menu.sh
 ```
-<br><br>
+<br>
 ▫️ Choose install first.<br>
 ▫️ How to access the menu again?<br>
 ./menu.sh<br>
