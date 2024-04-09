@@ -88,13 +88,17 @@ claim_all(){
     #########################################################
     ${NC}"
 
-    read -p "Please enter the RPC address: "common_rpc
-    read -p "Please gas fee: " common_gas
-    read -p "Please claim wallet: " common_wallet
+    local common_rpc
+    local common_gas
+    local common_wallet
 
-    priority_fee = $common_gas
-    rpc_url = $common_rpc
-    claim_address = $common_wallet
+    read -p "Please enter the RPC address: " common_rpc
+    read -p "Please enter gas fee: " common_gas
+    read -p "Please enter claim wallet: " common_wallet
+
+    priority_fee=$common_gas
+    rpc_url=$common_rpc
+    claim_address=$common_wallet
 
     keypairs=(~/.config/solana/*.json)
 
