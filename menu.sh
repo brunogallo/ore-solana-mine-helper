@@ -2,6 +2,8 @@
 
 default_directory="/root/ore"
 solana_config_path="/root/.config/solana/"
+RED='\033[0;31m'
+NC='\033[0m'
 
 # Modify the Gas fee function
 modify_gas() {
@@ -31,18 +33,6 @@ start_mining() {
 stop_mining() {
     echo "Stopping mining..."
     pm2 stop -f /root/ore/ore*.sh
-}
-
-# Start the claim function
-start_claim() {
-    echo "Starting Claim..."
-    pm2 start -f /root/ore/claim*.sh
-}
-
-# Stop the claim function
-stop_claim() {
-    echo "Stopping Claim..."
-    pm2 stop -f /root/ore/claim*.sh
 }
 
 # query_amount function
@@ -89,19 +79,75 @@ clear_proc(){
     pm2 delete all
 }
 
+claim_all(){
+    echo -e "${RED}
+    #########################################################
+    #                                                       #
+    #                       CLAIM                           #
+    #                                                       #
+    #########################################################
+    ${NC}"
+
+    read -p "Please enter the RPC address: "common_rpc
+    read -p "Please gas fee: " common_gas
+    read -p "Please claim wallet: " common_wallet
+
+    priority_fee = $common_gas
+    rpc_url = $common_rpc
+    claim_address = $common_wallet
+
+    keypairs=(~/.config/solana/*.json)
+
+    for keypair in "${keypairs[@]}"
+    do
+        filename=$(basename "$keypair")
+        result=$(ore --rpc "$rpc_url" --keypair "$keypair" rewards)
+        number=$(echo "$result" | awk '{print $1}')  # 
+        
+        if (( $(echo "$number < 0.005" | bc -l) )); then
+            echo "Skipping wallet: $filename, low ore balance: $number"
+            continue
+        fi
+        
+        echo "Wallet: $filename, ORE: $number"
+
+        ore --rpc "$rpc_url" --keypair ~/.config/solana/"$filename" --priority-fee "$priority_fee" claim "$number" "$claim_address"
+    done
+}
+
+update(){
+    echo -e "${RED}
+    #########################################################
+    #                                                       #
+    #                       UPDATE                          #
+    #                                                       #
+    #########################################################
+    ${NC}"
+
+    wget -O novo_menu.sh https://raw.githubusercontent.com/brunogallo/ore-solana-mine-helper/main/menu.sh && mv -f novo_menu.sh menu.sh && chmod +x menu.sh
+}
+
 # main_menu function
 main_menu() {
+    echo -e "${RED}
+    #########################################################
+    #                                                       #
+    #                     BOMBERS TEAM                      #
+    #                                                       #
+    #########################################################
+    ${NC}"
+    echo ""
+    echo ""
     echo "Please select an option: "
     echo "1. Modify RPC"
     echo "2. Modify Gas Fee"
     echo "3. Start Mining"
     echo "4. Stop Mining"
-    echo "5. Start Claim"
-    echo "6. Stop Claim"
-    echo "7. Watch"
-    echo "8. Farmed Ore"
-    echo "9. Clear ALL Proccess"
-    echo "10. View Wallet Private Key"
+    echo "5. Claim"
+    echo "6. Watch"
+    echo "7. Farmed Ore"
+    echo "8. Clear ALL Proccess"
+    echo "9. View Wallet Private Key"
     echo "0. exit"
 
     read -p "Please enter your choice: " choice
@@ -111,12 +157,11 @@ main_menu() {
         2) modify_gas ;;
         3) start_mining ;;
         4) stop_mining ;;
-        5) start_claim ;;
-        6) stop_claim ;;
-        7) watch ;;
-        8) query_amount ;;
-        9) clear_proc ;;
-        10) view_wallet_private_key ;;
+        5) claim_all ;;
+        6) watch ;;
+        7) query_amount ;;
+        8) clear_proc ;;
+        9) view_wallet_private_key ;;
         0) echo "Exiting script. "; exit ;;
         *) echo "Invalid selection, please enter a valid option. " ;;
     esac
