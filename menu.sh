@@ -94,11 +94,9 @@ claim_all(){
 
     read -p "Please enter the RPC address: " common_rpc
     read -p "Please enter gas fee: " common_gas
-    read -p "Please enter claim wallet: " common_wallet
 
     priority_fee=$common_gas
     rpc_url=$common_rpc
-    claim_address=$common_wallet
 
     keypairs=(~/.config/solana/*.json)
 
@@ -115,7 +113,7 @@ claim_all(){
         
         echo "Wallet: $filename, ORE: $number"
 
-        ore --rpc "$rpc_url" --keypair ~/.config/solana/"$filename" --priority-fee "$priority_fee" claim "$number" "$claim_address"
+        ore --rpc "$rpc_url" --keypair ~/.config/solana/"$filename" --priority-fee "$priority_fee" claim
     done
 }
 
