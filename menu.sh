@@ -150,6 +150,7 @@ main_menu() {
     echo "7. Farmed Ore"
     echo "8. Clear ALL Proccess"
     echo "9. View Wallet Private Key"
+    echo "69. Update"
     echo "0. exit"
 
     read -p "Please enter your choice: " choice
@@ -164,6 +165,7 @@ main_menu() {
         7) query_amount ;;
         8) clear_proc ;;
         9) view_wallet_private_key ;;
+        69) update ;;
         0) echo "Exiting script. "; exit ;;
         *) echo "Invalid selection, please enter a valid option. " ;;
     esac
