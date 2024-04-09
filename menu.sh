@@ -85,6 +85,10 @@ watch(){
     pm2 list --watch
 }
 
+clear_proc(){
+    pm2 delete all
+}
+
 # main_menu function
 main_menu() {
     echo "Please select an option: "
@@ -95,8 +99,9 @@ main_menu() {
     echo "5. Start Claim"
     echo "6. Stop Claim"
     echo "7. Watch"
-    echo "8. Query Quantity"
-    echo "9. View Wallet Private Key"
+    echo "8. Farmed Ore"
+    echo "9. Clear ALL Proccess"
+    echo "10. View Wallet Private Key"
     echo "0. exit"
 
     read -p "Please enter your choice: " choice
@@ -110,7 +115,8 @@ main_menu() {
         6) stop_claim ;;
         7) watch ;;
         8) query_amount ;;
-        9) view_wallet_private_key ;;
+        9) clear_proc ;;
+        10) view_wallet_private_key ;;
         0) echo "Exiting script. "; exit ;;
         *) echo "Invalid selection, please enter a valid option. " ;;
     esac
