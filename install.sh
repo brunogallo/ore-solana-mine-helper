@@ -44,7 +44,7 @@ install(){
         ore_file="/root/ore/ore$i.sh"
         echo "#!/bin/bash" > "$ore_file"
         rpc=$(select_random_rpc "$common_rpcs")
-        echo "ore --rpc $rpc --keypair ~/.config/solana/id$i.json --priority-fee 100000 mine --threads 8" >> "$ore_file"
+        echo "ore --rpc "$rpc" --keypair ~/.config/solana/id$i.json --priority-fee 100000 mine --threads 8" >> "$ore_file"
         chmod 755 "$ore_file"
     done
 
