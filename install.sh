@@ -29,19 +29,23 @@ install(){
     #########################################################
     ${NC}"
 
-    read -p "Please enter the RPC address: " common_rpc
+    select_random_rpc() {
+        IFS=',' read -ra rpc_addresses <<< "$1"
+        echo "${rpc_addresses[RANDOM % ${#rpc_addresses[@]}]}"
+    }
 
-    ore_count=$(ls -l /root/ore*.sh | wc -l)
+    read -p "Please enter the RPC address: " common_rpcs
+
+    wallet_count=$(ls -l ~/.config/solana/id*.json | wc -l)
     mkdir ore
     chmod 755 ore
-    cp /root/ore*.sh /root/ore/
-    chmod 755 /root/ore/ore*.sh
 
-    for ((i=1; i<=$ore_count; i++)); do
-        claim_file="/root/ore/claim$i.sh"
-        echo "#!/bin/bash" > "$claim_file"
-        echo "ore --rpc $common_rpc --keypair ~/.config/solana/id$i.json --priority-fee 20000000 claim" >> "$claim_file"
-        chmod 755 "$claim_file"
+    for ((i=1; i<=$wallet_count; i++)); do
+        ore_file="/root/ore/ore$i.sh"
+        echo "#!/bin/bash" > "$ore_file"
+        rpc=$(select_random_rpc "$common_rpcs")
+        echo "ore --rpc $rpc --keypair ~/.config/solana/id$i.json --priority-fee 100000 mine --threads 8" >> "$ore_file"
+        chmod 755 "$ore_file"
     done
 
     cx_script="#!/bin/bash
