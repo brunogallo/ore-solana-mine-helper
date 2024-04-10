@@ -38,11 +38,23 @@ stop_mining() {
 # query_amount function
 query_amount() {
     echo "Querying quantity..."
-    # Go to the path where the script is located and execute it
-    cd "$default_directory" || return
-    ./cx.sh
-    # Return to the parent path after execution
-    cd - || return
+
+    common_rpc="https://solana-rpc.publicnode.com"
+
+    keypairs=("$solana_config_path"*.json)
+    total_ore=0
+
+    for config in "${keypairs[@]}"; do
+        filename=$(basename "$config" .json)
+        numero="${filename//[!0-9]/}"
+        valor=$(ore --rpc "$common_rpc" --keypair "$config" rewards)
+        echo "Wallet: $numero - $valor"
+        valor=$(echo $valor | tr -d 'ORE') 
+        valor=$(echo $valor | awk '{print $1}')
+        total_ore=$(bc <<< "scale=7; $total_ore + $valor")
+    done
+
+    echo "Total ore mined: $total_ore"
 }
 
 # View wallet private key function
@@ -106,7 +118,7 @@ claim_all(){
         result=$(ore --rpc "$rpc_url" --keypair "$keypair" rewards)
         number=$(echo "$result" | awk '{print $1}')  # 
         
-        if (( $(echo "$number < 0.005" | bc -l) )); then
+        if (( $(echo "$number < 0.001" | bc -l) )); then
             echo "Skipping wallet: $filename, low ore balance: $number"
             continue
         fi
