@@ -34,7 +34,7 @@ install(){
         echo "${rpc_addresses[RANDOM % ${#rpc_addresses[@]}]}"
     }
 
-    read -p "Please enter the RPC address: " common_rpcs
+    read -p "Please enter the list of RPC address separated by , : " common_rpcs
 
     wallet_count=$(ls -l ~/.config/solana/id*.json | wc -l)
     mkdir ore
@@ -47,6 +47,8 @@ install(){
         echo "ore --rpc "$rpc" --keypair ~/.config/solana/id$i.json --priority-fee 100000 mine --threads 8" >> "$ore_file"
         chmod 755 "$ore_file"
     done
+
+    read -p "Please only one RPC address: " common_rpc
 
     cx_script="#!/bin/bash
     keypairs=(\"$solana_config_path\"*.json)
