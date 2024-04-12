@@ -94,28 +94,55 @@ clear_proc(){
 claim_all(){
     echo -e "${RED}
     #########################################################
-    #                                                       #
     #                       CLAIM                           #
-    #                                                       #
     #########################################################
     ${NC}"
 
+    local config_file="config.json"
     local common_rpc
     local common_gas
     local common_wallet
+    local receiver_wallet
 
-    read -p "Please enter the RPC address: " common_rpc
-    read -p "Please enter gas fee: " common_gas
+    if [ -f "$config_file" ]; then
+        common_rpc=$(jq -r '.rpc' "$config_file")
+        common_gas=$(jq -r '.gas' "$config_file")
+        receiver_wallet=$(jq -r '.wallet' "$config_file")
+    else
+        read -p "Please enter the RPC address: " common_rpc
+        read -p "Please enter gas fee: " common_gas
+        read -p "Please enter the wallet that will receive the ore: " common_wallet
 
-    priority_fee=$common_gas
-    rpc_url=$common_rpc
+        echo -e "${RED}
+        #########################################################
+        #                       ATENTION                        #
+        #########################################################
+        ${NC}"
+
+        echo "Copy the Account info address bellow and past on next question..."
+
+        echo -e "${RED}
+        #########################################################
+        ${NC}"
+
+        spl-token accounts -u "$common_rpc" --owner "$common_wallet" -v
+
+        echo -e "${RED}
+        #########################################################
+        ${NC}"
+
+        read -p "Please enter Account info generated: " receiver_wallet
+
+        jq -n --arg rpc "$common_rpc" --arg gas "$common_gas" --arg wallet "$receiver_wallet" '{"rpc": $rpc, "gas": $gas, "wallet": $wallet}' > "$config_file"
+        chmod -x config.json
+    fi
 
     keypairs=(~/.config/solana/*.json)
 
     for keypair in "${keypairs[@]}"
     do
         filename=$(basename "$keypair")
-        result=$(ore --rpc "$rpc_url" --keypair "$keypair" rewards)
+        result=$(ore --rpc "$common_rpc" --keypair "$keypair" rewards)
         number=$(echo "$result" | awk '{print $1}')  # 
         
         if (( $(echo "$number < 0.001" | bc -l) )); then
@@ -125,7 +152,7 @@ claim_all(){
         
         echo "Wallet: $filename, ORE: $number"
 
-        ore --rpc "$rpc_url" --keypair ~/.config/solana/"$filename" --priority-fee "$priority_fee" claim
+        ore --rpc "$common_rpc" --keypair ~/.config/solana/"$filename" --priority-fee "$common_gas" claim "$number" "$receiver_wallet"
     done
 }
 
